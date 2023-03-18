@@ -21,5 +21,5 @@ func main() {
 	defer db.Close()
 	r := gin.Default()
 	r = CollectRoute(r)
-	panic(r.Run()) // listen and serve on 0.0.0.0:8080
+	panic(r.Run())
 }
