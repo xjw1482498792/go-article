@@ -2,7 +2,9 @@ package controller
 
 import (
 	"goo/common"
+	"goo/dto"
 	"goo/model"
+	"goo/response"
 	"goo/util"
 	"log"
 	"net/http"
@@ -21,11 +23,11 @@ func Register(ctx *gin.Context) {
 	password := ctx.PostForm("password")
 	//验证数据
 	if len(telephone) != 11 {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"code": 422, "msg": "手机号必须为11位"})
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "手机号必须为11位")
 		return
 	}
 	if len(password) < 6 {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"code": 422, "msg": "密码不能少于6位"})
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "密码不能少于6位")
 		return
 	}
 	//如果名称没传，给一个10位的随机字符串
@@ -35,14 +37,14 @@ func Register(ctx *gin.Context) {
 	log.Println(name, telephone, password)
 	//判断手机号是否存在
 	if isTelephoneExist(DB, telephone) {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"code": 422, "msg": "用户已存在"})
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户已经存在")
 		return
 	}
 	//创建用户
 
 	hasedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "加密错误"})
+		response.Response(ctx, http.StatusUnprocessableEntity, 500, nil, "加密错误")
 		return
 	}
 	newUser := model.User{
@@ -52,11 +54,7 @@ func Register(ctx *gin.Context) {
 	}
 	DB.Create(&newUser)
 	//返回结果
-
-	ctx.JSON(200, gin.H{
-		"code": 200,
-		"msg":  "注册成功",
-	})
+	response.Success(ctx, nil, "注册成功")
 }
 
 func Login(ctx *gin.Context) {
@@ -94,16 +92,12 @@ func Login(ctx *gin.Context) {
 		return
 	}
 	//返回结果
-	ctx.JSON(200, gin.H{
-		"code": 200,
-		"data": gin.H{"token": token},
-		"msg":  "登录成功",
-	})
+	response.Success(ctx, gin.H{"token": token}, "注册成功")
 }
 
 func Info(ctx *gin.Context) {
 	user, _ := ctx.Get("user")
-	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": user}})
+	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user.(model.User))}})
 }
 func isTelephoneExist(db *gorm.DB, telephone string) bool {
 	var user model.User

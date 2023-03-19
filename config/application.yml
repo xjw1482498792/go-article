@@ -1,0 +1,7 @@
+datasource:
+  driverName: mysql
+  host: localhost
+  database: ginessential
+  username: root
+  password: 123456
+  charset: utf8mb4
