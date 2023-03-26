@@ -23,7 +23,7 @@ func main() {
 	defer db.Close()
 	r := gin.Default()
 	r = CollectRoute(r)
-	port := viper.GetString("server.port")
+	port := viper.GetString("serve.port")
 	if port != "" {
 		panic(r.Run(":" + port))
 	}

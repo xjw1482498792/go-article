@@ -1,3 +1,5 @@
+serve:
+ port: 1016
 datasource:
   driverName: mysql
   host: localhost
